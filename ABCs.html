@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sophia's ABCs</title>
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 1vw;
+      font-size: 15vw;
+      color: white;
+    }
+    .letter{
+      display: inline-block;
+      background-color: blue;
+      opacity: 0.5;
+      height: 1em;
+      width: 1em;
+      margin: 0.05em;
+      border-style: none;
+      font-weight: bold;
+      text-align: center;
+      vertical-align: center;
+      padding: 0.20em;
+      border-radius: 0.15em;
+      user-select: none;
+    }
+    .letter:hover{
+      opacity: 0.6;
+    }
+    .letter:active{
+      opacity: 0.7;
+      box-shadow: 0em 0.03em 0.05em 0.05em rgba(0,0,0, 0.7) inset;
+    }
+    .highlight{
+      opacity: 1.0 !important;
+    }
+  </style>
+</head>
+<body>
+  <audio id="letter_B">
+    <source src="Letter_B.m4a" type="audio/mp4"/>
+  </audio>
+  <audio id="letter_S">
+    <source src="Letter_S.m4a" type="audio/mp4"/>
+  </audio>
+<script>
+  function main(){
+    var ltr, ltrElm;
+    for(let i=0; i<26; i++){
+      ltr = String.fromCharCode(65+i);
+      ltrElm = document.createElement('span');
+      ltrElm.classList.add('letter');
+      ltrElm.innerHTML = ltr;
+      ltrElm.id = ltr+"_btn";
+      ltrElm.style.backgroundColor=colors[i];
+      document.body.appendChild(ltrElm);
+    }
+    document.getElementById('B_btn').onclick = function(e){
+      document.getElementById('letter_B').play();
+      document.getElementById('B_btn').classList.add('highlight');
+    };
+    document.getElementById('S_btn').onclick = function(e){
+      document.getElementById('letter_S').play();};
+    document.getElementById('letter_B').onended = function(e){
+       document.getElementById('B_btn').classList.remove('highlight');
+    };
+  }
+  var colors=['red','#cc0','blue','green',
+  'orange','red','#cc0','blue',
+  'red','blue','orange','green',
+  '#cc0','green','blue','red',
+  'orange','red','#cc0','orange',
+  'blue','green','red','#cc0',
+  '#cc0','blue'];
+  main();
+</script>  
+
+</body>
+</html>
