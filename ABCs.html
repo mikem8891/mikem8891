@@ -24,25 +24,29 @@
     }
     .letter{
       display: inline-block;
-      background-color: blue;
       opacity: 0.5;
       height: 1em;
       width: 1em;
-      margin: 0.05em;
+      margin: 0em;
       border-style: none;
+      border-width: 0em;
       font-weight: bold;
       text-align: center;
-      vertical-align: center;
       padding: 0.20em;
-      border-radius: 0.15em;
+      border-radius: inherit;
       user-select: none;
     }
-    .letter:hover{
-      opacity: 0.6;
-    }
     .letter:active{
-      opacity: 0.7;
-      box-shadow: 0em 0.03em 0.05em 0.05em rgba(0,0,0, 0.7) inset;
+      box-shadow: 0em 0em 0.05em 0.05em rgba(0,0,0, 0.7) inset;
+    }
+    .button{
+      display: inline-block;
+      background-color: #888;
+      margin: 0.05em;
+      padding: 0em;
+      border-style: none;
+      border-radius: 0.15em;
+      border-width: 0em;
     }
     .highlight{
       opacity: 1.0 !important;
@@ -50,34 +54,29 @@
   </style>
 </head>
 <body>
-  <audio id="letter_B">
-    <source src="Letter_B.m4a" type="audio/mp4"/>
-  </audio>
-  <audio id="letter_S">
-    <source src="Letter_S.m4a" type="audio/mp4"/>
-  </audio>
 <script>
   function main(){
-    var ltr, ltrElm;
+    var ltr, ltrElm, btnElm, audElm;
     for(let i=0; i<26; i++){
+      playing[i] = new Set();
+      available[i] = new Set();
       ltr = String.fromCharCode(65+i);
       ltrElm = document.createElement('span');
+      ltrElm.setAttribute('index', i);
+      ltrElm.setAttribute('letter', ltr);
       ltrElm.classList.add('letter');
       ltrElm.innerHTML = ltr;
       ltrElm.id = ltr+"_btn";
       ltrElm.style.backgroundColor=colors[i];
-      document.body.appendChild(ltrElm);
+      ltrElm.onclick = pressLetter;
+      btnElm = document.createElement('span');
+      btnElm.classList.add('button');
+      audElm = makeSound(ltrElm);
+      document.body.appendChild(btnElm);
+      btnElm.appendChild(ltrElm);
     }
-    document.getElementById('B_btn').onclick = function(e){
-      document.getElementById('letter_B').play();
-      document.getElementById('B_btn').classList.add('highlight');
-    };
-    document.getElementById('S_btn').onclick = function(e){
-      document.getElementById('letter_S').play();};
-    document.getElementById('letter_B').onended = function(e){
-       document.getElementById('B_btn').classList.remove('highlight');
-    };
   }
+  
   var colors=['red','#cc0','blue','green',
   'orange','red','#cc0','blue',
   'red','blue','orange','green',
@@ -85,6 +84,80 @@
   'orange','red','#cc0','orange',
   'blue','green','red','#cc0',
   '#cc0','blue'];
+  
+  var playing = [];
+  var available = [];
+  
+  function pressLetter(e){
+    let ltrElm = e.target;
+    let audElm, newAudElm;
+    let i = ltrElm.getAttribute('index');
+    audElm = available[i].values().next().value;
+    available[i].delete(audElm);
+    playing[i].add(audElm);
+    audElm=document.getElementById(audElm);
+    if(available[i].size < 1)
+      newAudElm = makeSound(ltrElm);
+    if(playing[i].size == 1)
+      ltrElm.classList.add('highlight');
+    audElm.play();
+  }
+  function endSound(e){
+    let audElm = e.target;
+    let ltrElm = audElm.parentElement;
+    let i = ltrElm.getAttribute('index');
+    available[i].add(audElm.id);
+    playing[i].delete(audElm.id);
+    if(playing[i].size < 1)
+      ltrElm.classList.remove('highlight');
+    audElm.currentTime = startTime[i];
+    audElm.pause();
+  }
+  
+  function makeSound(ltrElm){
+    let audElm = document.createElement('audio');
+    let i = ltrElm.getAttribute('index');
+    let ltr = ltrElm.getAttribute('letter');
+    audElm.src = "letter_"+ltr+".m4a";
+    audElm.type = "audio/mp4";
+    audElm.id = ltr + playing[i].size;
+    audElm.load();
+    audElm.currentTime = startTime[i];
+    audElm.pause();
+    audElm.onended = endSound;
+    available[i].add(audElm.id);
+    ltrElm.appendChild(audElm);
+    return audElm;
+  }
+  
+ var startTime = 
+   [0, // A
+    0.67, // B
+    0.6, // C
+    0,
+    0.5, // E
+    0.5,
+    0, // G
+    0,
+    0.3, // I
+    0.7,
+    0.5, // K
+    0.7,
+    0, // M
+    0,
+    0, // O
+    0,
+    0, // Q
+    0,
+    0, // S
+    0,
+    0, // U
+    0,
+    0, // W
+    0.3,
+    0, // Y
+    0.5] // Z
+  
   main();
 </script>  
 
