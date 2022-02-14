@@ -101,6 +101,7 @@
     if(playing[i].size == 1)
       ltrElm.classList.add('highlight');
     audElm.play();
+    audElm.currentTime = startTime[i];
   }
   function endSound(e){
     let audElm = e.target;
@@ -122,7 +123,6 @@
     audElm.type = "audio/mp4";
     audElm.id = ltr + playing[i].size;
     audElm.load();
-    audElm.currentTime = startTime[i];
     audElm.pause();
     audElm.onended = endSound;
     available[i].add(audElm.id);
