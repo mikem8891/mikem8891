@@ -122,12 +122,25 @@
     audElm.src = "Letter_"+ltr+".m4a";
     audElm.type = "audio/mp4";
     audElm.id = ltr + playing[i].size;
+    audElm.onended = endSound;
+    audElm.onabort = abort;
+    audElm.onerror = error;
+    audElm.onstall = stall;
     audElm.load();
     audElm.pause();
-    audElm.onended = endSound;
     available[i].add(audElm.id);
     ltrElm.appendChild(audElm);
     return audElm;
+  }
+  
+  function abort(){
+    alert('abort');
+  }
+  function error(){
+    alert('error');
+  }
+  function stall(){
+    alert('stall');
   }
   
  var startTime = 
