@@ -41,7 +41,7 @@
     }
     .button{
       display: inline-block;
-      background-color: #888;
+      background-color: #777;
       margin: 0.05em;
       padding: 0em;
       border-style: none;
@@ -58,8 +58,6 @@
   function main(){
     var ltr, ltrElm, btnElm, audElm;
     for(let i=0; i<26; i++){
-      playing[i] = new Set();
-      available[i] = new Set();
       ltr = String.fromCharCode(65+i);
       ltrElm = document.createElement('span');
       ltrElm.setAttribute('index', i);
@@ -85,32 +83,24 @@
   'blue','green','red','#cc0',
   '#cc0','blue'];
   
-  var playing = [];
-  var available = [];
+  var playing = null;
   
   function pressLetter(e){
+    if (playing)
+      return;
     let ltrElm = e.target;
-    let audElm, newAudElm;
+    playing = ltrElm.firstElementChild;
+    ltrElm.classList.add('highlight');
+    playing.play();
     let i = ltrElm.getAttribute('index');
-    audElm = available[i].values().next().value;
-    available[i].delete(audElm);
-    playing[i].add(audElm);
-    audElm=document.getElementById(audElm);
-    if(available[i].size < 1)
-      newAudElm = makeSound(ltrElm);
-    if(playing[i].size == 1)
-      ltrElm.classList.add('highlight');
-    audElm.play();
-    audElm.currentTime = startTime[i];
+    playing.currentTime = startTime[i];
   }
   function endSound(e){
     let audElm = e.target;
     let ltrElm = audElm.parentElement;
     let i = ltrElm.getAttribute('index');
-    available[i].add(audElm.id);
-    playing[i].delete(audElm.id);
-    if(playing[i].size < 1)
-      ltrElm.classList.remove('highlight');
+    playing = null;
+    ltrElm.classList.remove('highlight');
     audElm.currentTime = startTime[i];
     audElm.pause();
   }
@@ -121,14 +111,11 @@
     let ltr = ltrElm.getAttribute('letter');
     audElm.src = "Letter_"+ltr+".m4a";
     audElm.type = "audio/mp4";
-    audElm.id = ltr + playing[i].size;
+    audElm.id = ltr + '0';
     audElm.onended = endSound;
     audElm.onabort = abort;
     audElm.onerror = error;
     audElm.onstall = stall;
-    audElm.load();
-    audElm.pause();
-    available[i].add(audElm.id);
     ltrElm.appendChild(audElm);
     return audElm;
   }
@@ -136,8 +123,8 @@
   function abort(){
     alert('abort');
   }
-  function error(){
-    alert('error');
+  function error(e){
+    alert('error:' + e);
   }
   function stall(){
     alert('stall');
