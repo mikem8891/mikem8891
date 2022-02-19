@@ -101,13 +101,23 @@
   var playing = null;
   
   function pressLetter(e){
-    if (playing)
-      return;
+    let audElm = document.getElementById('sound');
+    if(playing){
+      if ((playing != 'testing instructions') && (audElm.currentTime > audElm.duration - 0.5)){
+        audElm.pause();
+        playing.classList.remove('highlight');
+        playing = null;
+      } else {
+        return;
+      }
+    }
     let ltrElm = e.target;
     let ltr = ltrElm.getAttribute('letter');
     let i = ltrElm.getAttribute('index');
     let track = Math.floor(Math.random()*suffix[i].length);
-    let audElm = document.getElementById('sound');
+    if ((lettersSinceTest.indexOf(ltr) == -1)&&(learnedLetter.indexOf(ltr) == -1)){
+      lettersSinceTest.push(ltr);
+    }
     audElm.src = "Letter_"+ltr+suffix[i][track]+".m4a";
     ltrElm.classList.add('highlight');
     audElm.play();
@@ -118,18 +128,29 @@
     let audElm = e.target;
     audElm.pause();
     playing.classList.remove('highlight');
+    if(testing){
+      lettersSinceTest = [];
+      let ltr = playing.getAttribute('letter');
+      if (ltr == testLetter){
+        addCoin();
+        learnedLetter.push(testLetter);
+      }
+      testing = false;
+    }
     playing = null;
     if(lettersSinceTest.length > 5){
-      testing = true;
+      testLetters();
     }
   }
   
   var lettersSinceTest = [];
+  var learnedLetter = [];
   var testing = false;
   var testLetter = '';
   
   function testLetters(){
     testing = true;
+    playing = 'testing instructions';
     //pick a letter to test
     let i = Math.floor(Math.random()*(lettersSinceTest.length - 1));
     testLetter = lettersSinceTest[i];
@@ -149,7 +170,16 @@
     audElm.removeEventListener('ended', testLetters2);
     let track = Math.floor(Math.random()*suffix[i].length);
     audElm.src = "Letter_"+ltr+suffix[i][track]+".m4a";
+    audElm.addEventListener('ended', testLetters3);
+    audElm.currentTime = startTime[i][track];
     audElm.play();
+  }
+  function testLetters3(){
+    playing = null;
+    let audElm = document.getElementById('sound');
+    audElm.pause();
+    audElm.removeEventListener('ended', testLetters3);
+    audElm.addEventListener('ended', endSound);
   }
   
   var coinNum = 0;
