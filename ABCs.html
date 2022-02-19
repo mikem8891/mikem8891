@@ -10,18 +10,33 @@
       font-family: Arial, sans-serif;
       text-align: center;
       margin: 1vw;
+    }
+    .button{
+      display: inline-block;
+      background-color: #777;
+      margin: 0.05em;
+      padding: 0em;
+      border-style: none;
+      border-radius: 0.15em;
+      border-width: 0em;
       font-size: 15vw;
       color: white;
     }
     @media screen and (orientation: portrait) {
-      body {
+      .button {
           font-size: 15vw;
       }
     }
     @media screen and (orientation: landscape) {
-      body {
+      .button {
           font-size: 7vw;
       }
+    }
+    div.score {
+      font-family: 'Consolas', 'Monaco', monospace;
+      width: 100%;
+      font-size: 2.5vw;
+      text-align: left;
     }
     .letter{
       display: inline-block;
@@ -40,21 +55,13 @@
     .letter:active{
       box-shadow: 0em 0em 0.05em 0.05em rgba(0,0,0, 0.7) inset;
     }
-    .button{
-      display: inline-block;
-      background-color: #777;
-      margin: 0.05em;
-      padding: 0em;
-      border-style: none;
-      border-radius: 0.15em;
-      border-width: 0em;
-    }
     .highlight{
       opacity: 1.0 !important;
     }
   </style>
 </head>
 <body>
+<div id= "score" class="score"></div>
 <script>
   function main(){
     var ltr, ltrElm, btnElm;
@@ -76,10 +83,12 @@
     let audElm = document.createElement('audio');
     audElm.type = 'audio/mp4';
     audElm.id = 'sound';
-    audElm.onended = endSound;
-    audElm.onerror = error;
-    audElm.onstall = stall;
+    audElm.addEventListener('ended', endSound);
+    audElm.addEventListener('error', error);
+    audElm.addEventListener('stall', stall);
     document.body.appendChild(audElm);
+    coinNum=-1;
+    addCoin();
   }
   
   var colors=['red','#cc0','blue','green',
@@ -95,7 +104,7 @@
   function pressLetter(e){
     let audElm = document.getElementById('sound');
     if(playing){
-      if (audElm.currentTime > audElm.duration - 0.5){
+      if ((playing != 'testing instructions') && (audElm.currentTime > audElm.duration - 0.5)){
         audElm.pause();
         playing.classList.remove('highlight');
         playing = null;
@@ -107,6 +116,9 @@
     let ltr = ltrElm.getAttribute('letter');
     let i = ltrElm.getAttribute('index');
     let track = Math.floor(Math.random()*suffix[i].length);
+    if ((lettersSinceTest.indexOf(ltr) == -1)&&(learnedLetter.indexOf(ltr) == -1)){
+      lettersSinceTest.push(ltr);
+    }
     audElm.src = "Letter_"+ltr+suffix[i][track]+".m4a";
     ltrElm.classList.add('highlight');
     audElm.play();
@@ -117,7 +129,71 @@
     let audElm = e.target;
     audElm.pause();
     playing.classList.remove('highlight');
+    if(testing){
+      lettersSinceTest = [];
+      let ltr = playing.getAttribute('letter');
+      if (ltr == testLetter){
+        addCoin();
+        learnedLetter.push(testLetter);
+      }
+      testing = false;
+    }
     playing = null;
+    if(lettersSinceTest.length > 5){
+      testLetters();
+    }
+  }
+  
+  var lettersSinceTest = [];
+  var learnedLetter = [];
+  var testing = false;
+  var testLetter = '';
+  
+  function testLetters(){
+    testing = true;
+    playing = 'testing instructions';
+    //pick a letter to test
+    let i = Math.floor(Math.random()*(lettersSinceTest.length - 1));
+    testLetter = lettersSinceTest[i];
+    // play "find the letter audio"
+    let audElm = document.getElementById('sound');
+    audElm.removeEventListener('ended', endSound);
+    audElm.src = "findLetter.m4a";
+    audElm.addEventListener('ended', testLetters2);
+    audElm.play();
+  }
+  function testLetters2(){
+    // play a letter recently listened to
+    let ltrElm = document.getElementById(testLetter+'_btn');
+    let ltr = ltrElm.getAttribute('letter');
+    let i = ltrElm.getAttribute('index');
+    let audElm = document.getElementById('sound');
+    audElm.removeEventListener('ended', testLetters2);
+    let track = Math.floor(Math.random()*suffix[i].length);
+    audElm.src = "Letter_"+ltr+suffix[i][track]+".m4a";
+    audElm.addEventListener('ended', testLetters3);
+    audElm.currentTime = startTime[i][track];
+    audElm.play();
+  }
+  function testLetters3(){
+    playing = null;
+    let audElm = document.getElementById('sound');
+    audElm.pause();
+    audElm.removeEventListener('ended', testLetters3);
+    audElm.addEventListener('ended', endSound);
+  }
+  
+  var coinNum = 0;
+  var coin = '&#x1F4BF;';
+  
+  function addCoin(){
+    var score = '';
+    coinNum++;
+    score += (coinNum + "=")
+    for (let i=0; i<coinNum; i++){
+      score += coin;
+    }
+    document.getElementById('score').innerHTML = score;
   }
   
   function error(e){
