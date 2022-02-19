@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -92,13 +93,20 @@
   var playing = null;
   
   function pressLetter(e){
-    if (playing)
-      return;
+    let audElm = document.getElementById('sound');
+    if(playing){
+      if (audElm.currentTime > audElm.duration - 0.5){
+        audElm.pause();
+        playing.classList.remove('highlight');
+        playing = null;
+      } else {
+        return;
+      }
+    }
     let ltrElm = e.target;
     let ltr = ltrElm.getAttribute('letter');
     let i = ltrElm.getAttribute('index');
     let track = Math.floor(Math.random()*suffix[i].length);
-    let audElm = document.getElementById('sound');
     audElm.src = "Letter_"+ltr+suffix[i][track]+".m4a";
     ltrElm.classList.add('highlight');
     audElm.play();
