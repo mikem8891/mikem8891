@@ -195,7 +195,8 @@
         playing = null;
       }else{
         playing = 'testing instructions';
-        lettersSinceTest.push(ltr);
+        if (learnedLetter.indexOf(ltr) == -1)
+          lettersSinceTest.push(ltr);
         audElm.removeEventListener('ended', endSound);
         audElm.src = "tryAgain.m4a";
         audElm.addEventListener('ended', endSound2);
