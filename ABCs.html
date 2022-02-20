@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,6 +17,26 @@
       width: 100%;
       font-size: 2.5vw;
       text-align: left;
+    }
+    span.coin{
+      display: inline-block;
+      background-color: gold;
+      background-image: linear-gradient(to bottom right, gold, #ffec80, gold, gold);
+      font-family: Arial, sans-serif;
+      font-size: 4vw;
+      font-weight: bold;
+      height: 1em;
+      width:  1em;
+      text-align: center;
+      text-shadow: 0em 0em 0.2em rgba(0,0,0, 0.3);
+      color: #ffe866;
+      padding: 0.1em;
+      border-style: solid;
+      border-width: 0.1em;
+      border-color: #ffe866;
+      border-radius: 50%;
+      margin: 0.05em;
+      box-shadow: 0em 0em 0.2em rgba(0,0,0, 0.3) inset, 0em 0em 0.2em rgba(0,0,0, 0.5);
     }
     .button{
       display: inline-block;
@@ -35,6 +56,9 @@
       div.score {
         font-size: 5vw;
       }
+      span.coin{
+        font-size: 4vw;
+      }
     }
     @media screen and (orientation: landscape) {
       .button {
@@ -42,6 +66,9 @@
       }
       div.score {
         font-size: 2.5vw;
+      }
+      span.coin{
+        font-size: 2vw;
       }
     }
     .letter{
@@ -139,8 +166,8 @@
       lettersSinceTest = [];
       let ltr = playing.getAttribute('letter');
       if (ltr == testLetter){
-        addCoin();
         learnedLetter.push(testLetter);
+        addCoin();
       }
       testing = false;
     }
@@ -196,10 +223,13 @@
     var score = '';
     coinNum++;
     score += (coinNum + "=")
-    for (let i=0; i<coinNum; i++){
-      score += coin;
+    for (let i=0; i<learnedLetter.length; i++){
+      score += coinStr(learnedLetter[i]);
     }
     document.getElementById('score').innerHTML = score;
+  }
+  function coinStr(ltr){
+    return '<span class="coin">'+ltr+'</span>';
   }
   
   function error(e){
