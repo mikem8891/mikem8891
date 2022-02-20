@@ -20,8 +20,8 @@
       text-align: left;
     }
     div.overlay{
-/*      visibility: hidden;*/
-      font-size: 20vw;
+      visibility: hidden;
+      font-size: 50vh;
       text-align: center;
       vertical-align: middle;
       background-color: rgba(0,0,0,0.5);
@@ -71,6 +71,9 @@
       div.score {
         font-size: 5vw;
       }
+      div.overlay{
+        font-size: 50vw;
+      }
     }
     @media screen and (orientation: landscape) {
       .button {
@@ -78,6 +81,9 @@
       }
       div.score {
         font-size: 2.5vw;
+      }
+      div.overlay{
+        font-size: 50vh;
       }
     }
     .letter{
@@ -144,9 +150,13 @@
   '#cc0','blue'];
   
   var playing = null;
+  var lettersBeforeTest = 5;
+  var readyForTest = false;
   
   function pressLetter(e){
     let audElm = document.getElementById('sound');
+    if((playing && testing) || (readyForTest))
+      return;
     if(playing){
       if ((playing != 'testing instructions') && (audElm.currentTime > audElm.duration - 0.5)){
         audElm.pause();
@@ -160,13 +170,18 @@
     let ltr = ltrElm.getAttribute('letter');
     let i = ltrElm.getAttribute('index');
     let track = Math.floor(Math.random()*suffix[i].length);
-    if ((lettersSinceTest.indexOf(ltr) == -1)&&(learnedLetter.indexOf(ltr) == -1)){
+    if ((lettersSinceTest.indexOf(ltr) == -1)&&(learnedLetter.indexOf(ltr) == -1))
       lettersSinceTest.push(ltr);
-    }
+    if(lettersSinceTest.length >= lettersBeforeTest)
+      readyForTest = true;
     audElm.src = "Letter_"+ltr+suffix[i][track]+".m4a";
     ltrElm.classList.add('highlight');
     audElm.play();
     audElm.currentTime = startTime[i][track];
+    if (testing && (ltr == testLetter)){
+      learnedLetter.push(testLetter);
+      showCoinOverlay();
+    }
     playing = ltrElm;
   }
   function endSound(e){
@@ -177,17 +192,30 @@
       lettersSinceTest = [];
       let ltr = playing.getAttribute('letter');
       if (ltr == testLetter){
-        learnedLetter.push(testLetter);
-        showCoinOverlay();
+        playing = null;
       }else{
+        playing = 'testing instructions';
         lettersSinceTest.push(ltr);
+        audElm.removeEventListener('ended', endSound);
+        audElm.src = "tryAgain.m4a";
+        audElm.addEventListener('ended', endSound2);
+        audElm.play();
       }
+      readyForTest = false;
       testing = false;
+      return;
     }
     playing = null;
-    if(lettersSinceTest.length > 5){
+    if(readyForTest){
       testLetters();
     }
+  }
+  function endSound2(e){
+    var audElm = e.target;
+    audElm.pause();
+    audElm.removeEventListener('ended', endSound2);
+    audElm.addEventListener('ended', endSound);
+    playing = null;
   }
   function showCoinOverlay(){
     var overlay = document.getElementById("overlay");
@@ -237,6 +265,7 @@
     audElm.pause();
     audElm.removeEventListener('ended', testLetters3);
     audElm.addEventListener('ended', endSound);
+    readyForTest = false;
   }
   
   var coinNum = 0;
