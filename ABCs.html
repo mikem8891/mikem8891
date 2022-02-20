@@ -11,12 +11,26 @@
       font-family: Arial, sans-serif;
       text-align: center;
       margin: 1vw;
+      user-select: none;
     }
     div.score {
       font-family: 'Consolas', 'Monaco', monospace;
       width: 100%;
       font-size: 5vw;
       text-align: left;
+    }
+    div.overlay{
+/*      visibility: hidden;*/
+      font-size: 20vw;
+      text-align: center;
+      vertical-align: middle;
+      background-color: rgba(0,0,0,0.5);
+      position: fixed;
+      width:  100%;
+      height: 100%;
+      top:  0px;
+      left: 0px;
+      z-index:1;
     }
     span.coin{
       display: inline-block;
@@ -28,6 +42,7 @@
       height: 1em;
       width:  1em;
       text-align: center;
+      vertical-align: middle;
       text-shadow: 0em 0em 0.2em rgba(0,0,0, 0.3);
       color: #ffe866;
       padding: 0.1em;
@@ -75,6 +90,7 @@
       border-width: 0em;
       font-weight: bold;
       text-align: center;
+      vertical-align: middle;
       padding: 0.20em;
       border-radius: inherit;
       user-select: none;
@@ -89,6 +105,7 @@
 </head>
 <body>
 <div id= "score" class="score"></div>
+<div id= "overlay" class="overlay" onmouseup="closeOverlay();"><span class="coin">M</span></div>
 <script>
   function main(){
     var ltr, ltrElm, btnElm;
@@ -161,7 +178,9 @@
       let ltr = playing.getAttribute('letter');
       if (ltr == testLetter){
         learnedLetter.push(testLetter);
-        addCoin();
+        showCoinOverlay();
+      }else{
+        lettersSinceTest.push(ltr);
       }
       testing = false;
     }
@@ -169,6 +188,16 @@
     if(lettersSinceTest.length > 5){
       testLetters();
     }
+  }
+  function showCoinOverlay(){
+    var overlay = document.getElementById("overlay");
+    overlay.innerHTML = coinStr(testLetter);
+    overlay.style.visibility = 'visible';
+  }
+  function closeOverlay(e){
+    var overlay = document.getElementById("overlay");
+    addCoin();
+    overlay.style.visibility = 'hidden';
   }
   
   var lettersSinceTest = [];
@@ -216,7 +245,7 @@
   function addCoin(){
     var score = '';
     coinNum++;
-    score += (coinNum + "=")
+    score += (learnedLetter.length + "=")
     for (let i=0; i<learnedLetter.length; i++){
       score += coinStr(learnedLetter[i]);
     }
