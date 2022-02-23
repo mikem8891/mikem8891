@@ -20,10 +20,11 @@
       text-align: left;
     }
     div.overlay{
-      visibility: hidden;
-      font-size: 50vh;
+    /*  visibility: hidden; */
+      font-size: 20vh;
       text-align: center;
-      vertical-align: middle;
+    /*  vertical-align: middle; */
+      padding-top: 25vh;
       background-color: rgba(0,0,0,0.5);
       position: fixed;
       width:  100%;
@@ -72,7 +73,7 @@
         font-size: 5vw;
       }
       div.overlay{
-        font-size: 50vw;
+        font-size: 20vw;
       }
     }
     @media screen and (orientation: landscape) {
@@ -83,7 +84,7 @@
         font-size: 2.5vw;
       }
       div.overlay{
-        font-size: 50vh;
+        font-size: 20vh;
       }
     }
     .letter{
@@ -111,7 +112,7 @@
 </head>
 <body>
 <div id= "score" class="score"></div>
-<div id= "overlay" class="overlay" onmouseup="closeOverlay();"><span class="coin">M</span></div>
+<div id= "overlay" class="overlay" onmouseup="closeOverlay();">&#x1F451;<span class="coin">M</span>&#x1F389;</div>
 <script>
   function main(){
     var ltr, ltrElm, btnElm;
