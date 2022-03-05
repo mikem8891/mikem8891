@@ -198,7 +198,7 @@
         if (learnedLetter.indexOf(ltr) == -1)
           lettersSinceTest.push(ltr);
         audElm.removeEventListener('ended', endSound);
-        audElm.src = "tryAgain.m4a";
+        audElm.src = "Sorry.m4a";
         audElm.addEventListener('ended', endSound2);
         audElm.play();
       }
@@ -213,10 +213,13 @@
   }
   function endSound2(e){
     var audElm = e.target;
+    var ltr = testLetter;
+    var ltrElm = document.getElementById(ltr+"_btn");
     audElm.pause();
     audElm.removeEventListener('ended', endSound2);
     audElm.addEventListener('ended', endSound);
     playing = null;
+    ltrElm.click();
   }
   function showCoinOverlay(){
     var overlay = document.getElementById("overlay");
