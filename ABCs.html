@@ -37,7 +37,7 @@
       background-color: gold;
       background-image: linear-gradient(to bottom right, gold, #ffec80, gold, gold);
       font-family: Arial, sans-serif;
-      font-size: 80%;
+      font-size: 90%;
       font-weight: bold;
       height: 1em;
       width:  1em;
@@ -113,10 +113,21 @@
 <div id= "score" class="score"></div>
 <div id= "overlay" class="overlay" onmouseup="closeOverlay();"><span class="coin">M</span></div>
 <script>
+
+  var lettersToLearn = [];
+  var playing = null;
+  var lettersBeforeTest = 5;
+  var lettersSinceTest = [];
+  var learnedLetter = [];
+  var testing = false;
+  var testLetter = '';
+  var readyForTest = false;
+
   function main(){
     var ltr, ltrElm, btnElm;
     for(let i=0; i<26; i++){
       ltr = String.fromCharCode(65+i);
+      lettersToLearn.push(ltr);
       ltrElm = document.createElement('span');
       ltrElm.setAttribute('index', i);
       ltrElm.setAttribute('letter', ltr);
@@ -129,6 +140,11 @@
       btnElm.classList.add('button');
       document.body.appendChild(btnElm);
       btnElm.appendChild(ltrElm);
+    }
+    for (let i=0; i<lettersBeforeTest; i++){
+      let j = Math.floor(Math.random()*(lettersToLearn.length - 1));
+      lettersSinceTest.push(lettersToLearn[j]);
+      lettersToLearn.splice(j, 1);
     }
     let audElm = document.createElement('audio');
     audElm.type = 'audio/mp4';
@@ -149,9 +165,6 @@
   'blue','green','red','#cc0',
   '#cc0','blue'];
   
-  var playing = null;
-  var lettersBeforeTest = 5;
-  var readyForTest = false;
   
   function pressLetter(e){
     let audElm = document.getElementById('sound');
@@ -170,9 +183,19 @@
     let ltr = ltrElm.getAttribute('letter');
     let i = ltrElm.getAttribute('index');
     let track = Math.floor(Math.random()*suffix[i].length);
-    if ((lettersSinceTest.indexOf(ltr) == -1)&&(learnedLetter.indexOf(ltr) == -1))
+    let j = lettersToLearn.indexOf(ltr);
+    if (j != -1){
       lettersSinceTest.push(ltr);
-    if(lettersSinceTest.length >= lettersBeforeTest)
+      lettersToLearn.splice(j, 1);
+    }
+    while((lettersSinceTest.length < lettersBeforeTest) && 
+          (lettersToLearn.length   > 0)){
+      j = Math.floor(Math.random()*(lettersToLearn.length - 1));
+      lettersSinceTest.push(lettersToLearn[j]);
+      lettersToLearn.splice(j, 1);
+    }
+    if((lettersSinceTest.length >= lettersBeforeTest) || 
+       (lettersToLearn.length == 0) && (lettersSinceTest.length > 0))
       readyForTest = true;
     audElm.src = "Letter_"+ltr+suffix[i][track]+".m4a";
     ltrElm.classList.add('highlight');
@@ -189,14 +212,18 @@
     audElm.pause();
     playing.classList.remove('highlight');
     if(testing){
-      lettersSinceTest = [];
+//      lettersSinceTest = [];
       let ltr = playing.getAttribute('letter');
       if (ltr == testLetter){
         playing = null;
       }else{
         playing = 'testing instructions';
-        if (learnedLetter.indexOf(ltr) == -1)
+        let j = lettersToLearn.indexOf(ltr);
+        if (j != -1){
           lettersSinceTest.push(ltr);
+          lettersToLearn.splice(j, 1);
+        }
+        lettersToLearn.push(testLetter);
         audElm.removeEventListener('ended', endSound);
         audElm.src = "Sorry.m4a";
         audElm.addEventListener('ended', endSound2);
@@ -230,12 +257,16 @@
     var overlay = document.getElementById("overlay");
     addCoin();
     overlay.style.visibility = 'hidden';
+    if((lettersSinceTest.length >= lettersBeforeTest) || 
+       (lettersToLearn.length == 0) && (lettersSinceTest.length > 0))
+      readyForTest = true;
+    if(readyForTest){
+      if (playing){
+        playing.classList.remove('highlight');
+      }
+      testLetters();
+    }
   }
-  
-  var lettersSinceTest = [];
-  var learnedLetter = [];
-  var testing = false;
-  var testLetter = '';
   
   function testLetters(){
     testing = true;
@@ -243,6 +274,7 @@
     //pick a letter to test
     let i = Math.floor(Math.random()*(lettersSinceTest.length - 1));
     testLetter = lettersSinceTest[i];
+    lettersSinceTest.splice(i,1);
     // play "find the letter audio"
     let audElm = document.getElementById('sound');
     audElm.removeEventListener('ended', endSound);
@@ -324,11 +356,11 @@
     [0.5, 0, 0]] // Z 
  var suffix = 
    [['', '_d', '_m'], // A
-    ['', '_d', '_m'], // B
-    ['', '_d', '_m'], // C
+    [    '_d', '_m'], // B
+    [    '_d', '_m'], // C
     ['', '_d', '_m'], // D
     ['', '_d', '_m'], // E
-    [    '_d', '_m'], // F
+    [          '_m'], // F
     [    '_d', '_m'], // G
     ['', '_d', '_m'], // H
     [    '_d', '_m'], // I
