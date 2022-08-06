@@ -142,7 +142,7 @@
       btnElm.appendChild(ltrElm);
     }
     for (let i=0; i<lettersBeforeTest; i++){
-      let j = Math.floor(Math.random()*(lettersToLearn.length - 1));
+      let j = Math.floor(Math.random()*(lettersToLearn.length - .01));
       lettersSinceTest.push(lettersToLearn[j]);
       lettersToLearn.splice(j, 1);
     }
@@ -190,7 +190,7 @@
     }
     while((lettersSinceTest.length < lettersBeforeTest) && 
           (lettersToLearn.length   > 0)){
-      j = Math.floor(Math.random()*(lettersToLearn.length - 1));
+      j = Math.floor(Math.random()*(lettersToLearn.length - .01));
       lettersSinceTest.push(lettersToLearn[j]);
       lettersToLearn.splice(j, 1);
     }
@@ -272,7 +272,7 @@
     testing = true;
     playing = 'testing instructions';
     //pick a letter to test
-    let i = Math.floor(Math.random()*(lettersSinceTest.length - 1));
+    let i = Math.floor(Math.random()*(lettersSinceTest.length - .01));
     testLetter = lettersSinceTest[i];
     lettersSinceTest.splice(i,1);
     // play "find the letter audio"
@@ -331,13 +331,13 @@
    [[0,   0, 0], // A 
     [     0, 0], // B 
     [     0, 0], // C 
-    [0,   0, 0], // D 
+    [0,      0], // D 
     [0.5, 0, 0], // E 
     [        0], // F -
     [     0, 0], // G -
-    [0,   0, 0], // H 
+    [     0, 0], // H 
     [     0, 0], // I -
-    [0.7, 0, 0], // J 
+    [     0, 0], // J 
     [0.5, 0, 0], // K 
     [     0, 0], // L -
     [0,   0, 0], // M 
@@ -358,13 +358,13 @@
    [['', '_d', '_m'], // A
     [    '_d', '_m'], // B
     [    '_d', '_m'], // C
-    ['', '_d', '_m'], // D
+    ['',       '_m'], // D
     ['', '_d', '_m'], // E
     [          '_m'], // F
     [    '_d', '_m'], // G
-    ['', '_d', '_m'], // H
+    [    '_d', '_m'], // H
     [    '_d', '_m'], // I
-    ['', '_d', '_m'], // J
+    [    '_d', '_m'], // J
     ['', '_d', '_m'], // K
     [    '_d', '_m'], // L
     ['', '_d', '_m'], // M
