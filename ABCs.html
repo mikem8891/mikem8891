@@ -124,9 +124,15 @@
   var readyForTest = false;
 
   function main(){
-    var ltr, ltrElm, btnElm;
+    var ltrs = [], ltr, ltrElm, btnElm;
+    for(let i=0; i<26; i++)
+      ltrs.push(String.fromCharCode(65+i));
     for(let i=0; i<26; i++){
-      ltr = String.fromCharCode(65+i);
+      let j = Math.floor(Math.random()*(ltrs.length - .01));
+      let swap = ltrs[j];
+      ltrs[j] = ltrs[ltrs.length - 1];
+      ltrs[ltrs.length - 1] = swap;
+      ltr = ltrs.pop();
       lettersToLearn.push(ltr);
       ltrElm = document.createElement('span');
       ltrElm.setAttribute('index', i);
