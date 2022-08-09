@@ -124,15 +124,19 @@
   var readyForTest = false;
 
   function main(){
-    var ltrs = [], ltr, ltrElm, btnElm;
-    for(let i=0; i<26; i++)
-      ltrs.push(String.fromCharCode(65+i));
+    var ltrs = {}, ltr, ltrElm, btnElm;
     for(let i=0; i<26; i++){
-      let j = Math.floor(Math.random()*(ltrs.length - .01));
-      let swap = ltrs[j];
-      ltrs[j] = ltrs[ltrs.length - 1];
-      ltrs[ltrs.length - 1] = swap;
-      ltr = ltrs.pop();
+      if(!ltrs[colors[i]])
+        ltrs[colors[i]] = [];
+      ltrs[colors[i]].push(String.fromCharCode(65+i));
+    }
+    for(let i=0; i<26; i++){
+      let clrLtr = ltrs[colors[i]];
+      let j = Math.floor(Math.random()*(clrLtr.length - .01));
+      let swap = clrLtr[j];
+      clrLtr[j] = clrLtr[clrLtr.length - 1];
+      clrLtr[clrLtr.length - 1] = swap;
+      ltr = clrLtr.pop();
       lettersToLearn.push(ltr);
       ltrElm = document.createElement('span');
       ltrElm.setAttribute('index', i);
@@ -344,7 +348,7 @@
     [     0, 0], // H 
     [     0, 0], // I -
     [     0, 0], // J 
-    [0.5, 0, 0], // K 
+    [0.6, 0, 0], // K 
     [     0, 0], // L -
     [0,   0, 0], // M 
     [0,   0, 0], // N 
