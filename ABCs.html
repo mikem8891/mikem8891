@@ -122,6 +122,7 @@
   var testing = false;
   var testLetter = '';
   var readyForTest = false;
+  var correction = false;
 
   function main(){
     var ltrs = {}, ltr, ltrElm, btnElm;
@@ -185,6 +186,13 @@
         audElm.pause();
         playing.classList.remove('highlight');
         playing = null;
+      } else {
+        return;
+      }
+    }
+    if (correction){
+      if (ltr == testLetter){
+        playing.classList.remove('highlight');
       } else {
         return;
       }
@@ -256,7 +264,9 @@
     audElm.removeEventListener('ended', endSound2);
     audElm.addEventListener('ended', endSound);
     playing = null;
-    ltrElm.click();
+    ltrElm.classList.add('highlight');
+    correction = true;
+    //ltrElm.click();
   }
   function showCoinOverlay(){
     var overlay = document.getElementById("overlay");
