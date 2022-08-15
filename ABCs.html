@@ -37,7 +37,7 @@
       background-color: gold;
       background-image: linear-gradient(to bottom right, gold, #ffec80, gold, gold);
       font-family: Arial, sans-serif;
-      font-size: 80%;
+      font-size: 90%;
       font-weight: bold;
       height: 1em;
       width:  1em;
@@ -113,13 +113,34 @@
 <div id= "score" class="score"></div>
 <div id= "overlay" class="overlay" onmouseup="closeOverlay();"><span class="coin">M</span></div>
 <script>
+
+  var lettersToLearn = [];
+  var playing = null;
+  var lettersBeforeTest = 5;
+  var lettersSinceTest = [];
+  var learnedLetter = [];
+  var testing = false;
+  var testLetter = '';
+  var readyForTest = false;
+
   function main(){
-    var ltr, ltrElm, btnElm;
+    var ltrs = {}, ltr, ltrElm, btnElm;
     for(let i=0; i<26; i++){
-      ltr = String.fromCharCode(65+i);
+      if(!ltrs[colors[i]])
+        ltrs[colors[i]] = [];
+      ltrs[colors[i]].push(String.fromCharCode(65+i));
+    }
+    for(let i=0; i<26; i++){
+      let clrLtr = ltrs[colors[i]];
+      let j = Math.floor(Math.random()*(clrLtr.length - .01));
+      let swap = clrLtr[j];
+      clrLtr[j] = clrLtr[clrLtr.length - 1];
+      clrLtr[clrLtr.length - 1] = swap;
+      ltr = clrLtr.pop();
+      lettersToLearn.push(ltr);
       ltrElm = document.createElement('span');
-      ltrElm.setAttribute('index', i);
       ltrElm.setAttribute('letter', ltr);
+      ltrElm.setAttribute('index', ltr.charCodeAt(0)-65);
       ltrElm.classList.add('letter');
       ltrElm.innerHTML = ltr;
       ltrElm.id = ltr+"_btn";
@@ -129,6 +150,11 @@
       btnElm.classList.add('button');
       document.body.appendChild(btnElm);
       btnElm.appendChild(ltrElm);
+    }
+    for (let i=0; i<lettersBeforeTest; i++){
+      let j = Math.floor(Math.random()*(lettersToLearn.length - .01));
+      lettersSinceTest.push(lettersToLearn[j]);
+      lettersToLearn.splice(j, 1);
     }
     let audElm = document.createElement('audio');
     audElm.type = 'audio/mp4';
@@ -149,9 +175,6 @@
   'blue','green','red','#cc0',
   '#cc0','blue'];
   
-  var playing = null;
-  var lettersBeforeTest = 5;
-  var readyForTest = false;
   
   function pressLetter(e){
     let audElm = document.getElementById('sound');
@@ -170,9 +193,19 @@
     let ltr = ltrElm.getAttribute('letter');
     let i = ltrElm.getAttribute('index');
     let track = Math.floor(Math.random()*suffix[i].length);
-    if ((lettersSinceTest.indexOf(ltr) == -1)&&(learnedLetter.indexOf(ltr) == -1))
+    let j = lettersToLearn.indexOf(ltr);
+    if (j != -1){
       lettersSinceTest.push(ltr);
-    if(lettersSinceTest.length >= lettersBeforeTest)
+      lettersToLearn.splice(j, 1);
+    }
+    while((lettersSinceTest.length < lettersBeforeTest) && 
+          (lettersToLearn.length   > 0)){
+      j = Math.floor(Math.random()*(lettersToLearn.length - .01));
+      lettersSinceTest.push(lettersToLearn[j]);
+      lettersToLearn.splice(j, 1);
+    }
+    if((lettersSinceTest.length >= lettersBeforeTest) || 
+       (lettersToLearn.length == 0) && (lettersSinceTest.length > 0))
       readyForTest = true;
     audElm.src = "Letter_"+ltr+suffix[i][track]+".m4a";
     ltrElm.classList.add('highlight');
@@ -189,14 +222,18 @@
     audElm.pause();
     playing.classList.remove('highlight');
     if(testing){
-      lettersSinceTest = [];
+//      lettersSinceTest = [];
       let ltr = playing.getAttribute('letter');
       if (ltr == testLetter){
         playing = null;
       }else{
         playing = 'testing instructions';
-        if (learnedLetter.indexOf(ltr) == -1)
+        let j = lettersToLearn.indexOf(ltr);
+        if (j != -1){
           lettersSinceTest.push(ltr);
+          lettersToLearn.splice(j, 1);
+        }
+        lettersToLearn.push(testLetter);
         audElm.removeEventListener('ended', endSound);
         audElm.src = "Sorry.m4a";
         audElm.addEventListener('ended', endSound2);
@@ -230,19 +267,24 @@
     var overlay = document.getElementById("overlay");
     addCoin();
     overlay.style.visibility = 'hidden';
+    if((lettersSinceTest.length >= lettersBeforeTest) || 
+       (lettersToLearn.length == 0) && (lettersSinceTest.length > 0))
+      readyForTest = true;
+    if(readyForTest){
+      if (playing){
+        playing.classList.remove('highlight');
+      }
+      testLetters();
+    }
   }
-  
-  var lettersSinceTest = [];
-  var learnedLetter = [];
-  var testing = false;
-  var testLetter = '';
   
   function testLetters(){
     testing = true;
     playing = 'testing instructions';
     //pick a letter to test
-    let i = Math.floor(Math.random()*(lettersSinceTest.length - 1));
+    let i = Math.floor(Math.random()*(lettersSinceTest.length - .01));
     testLetter = lettersSinceTest[i];
+    lettersSinceTest.splice(i,1);
     // play "find the letter audio"
     let audElm = document.getElementById('sound');
     audElm.removeEventListener('ended', endSound);
@@ -297,16 +339,16 @@
   
  var startTime = 
    [[0,   0, 0], // A 
-    [0.67,0, 0], // B 
-    [0.6, 0, 0], // C 
-    [0,   0, 0], // D 
-    [0.5, 0, 0], // E 
-    [     0, 0], // F -
+    [     0, 0], // B 
+    [     0, 0], // C 
+    [0,      0], // D 
+    [0.4, 0, 0], // E 
+    [        0], // F -
     [     0, 0], // G -
-    [0,   0, 0], // H 
+    [     0, 0], // H 
     [     0, 0], // I -
-    [0.7, 0, 0], // J 
-    [0.5, 0, 0], // K 
+    [     0, 0], // J 
+    [0.6, 0, 0], // K 
     [     0, 0], // L -
     [0,   0, 0], // M 
     [0,   0, 0], // N 
@@ -314,25 +356,25 @@
     [0,   0, 0], // P 
     [0,   0, 0], // Q 
     [0,   0, 0], // R 
-    [0,   0, 0], // S 
+    [0,      0], // S 
     [0,   0, 0], // T 
     [0,   0, 0], // U 
-    [0,   0, 0], // V 
+    [0,      0], // V 
     [     0, 0], // W -
     [0.3, 0, 0], // X 
     [0,   0, 0], // Y 
     [0.5, 0, 0]] // Z 
  var suffix = 
    [['', '_d', '_m'], // A
-    ['', '_d', '_m'], // B
-    ['', '_d', '_m'], // C
-    ['', '_d', '_m'], // D
+    [    '_d', '_m'], // B
+    [    '_d', '_m'], // C
+    ['',       '_m'], // D
     ['', '_d', '_m'], // E
-    [    '_d', '_m'], // F
+    [          '_m'], // F
     [    '_d', '_m'], // G
-    ['', '_d', '_m'], // H
+    [    '_d', '_m'], // H
     [    '_d', '_m'], // I
-    ['', '_d', '_m'], // J
+    [    '_d', '_m'], // J
     ['', '_d', '_m'], // K
     [    '_d', '_m'], // L
     ['', '_d', '_m'], // M
@@ -341,10 +383,10 @@
     ['', '_d', '_m'], // P
     ['', '_d', '_m'], // Q
     ['', '_d', '_m'], // R
-    ['', '_d', '_m'], // S
+    ['',       '_m'], // S
     ['', '_d', '_m'], // T
     ['', '_d', '_m'], // U
-    ['', '_d', '_m'], // V
+    ['',       '_m'], // V
     [    '_d', '_m'], // W
     ['', '_d', '_m'], // X
     ['', '_d', '_m'], // Y
