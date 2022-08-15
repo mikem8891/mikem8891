@@ -190,15 +190,16 @@
         return;
       }
     }
+    let ltrElm = e.target;
+    let ltr = ltrElm.getAttribute('letter');
     if (correction){
       if (ltr == testLetter){
-        playing.classList.remove('highlight');
+        ltrElm.classList.remove('highlight');
+        correction = false;
       } else {
         return;
       }
     }
-    let ltrElm = e.target;
-    let ltr = ltrElm.getAttribute('letter');
     let i = ltrElm.getAttribute('index');
     let track = Math.floor(Math.random()*suffix[i].length);
     let j = lettersToLearn.indexOf(ltr);
