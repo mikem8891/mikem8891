@@ -93,7 +93,7 @@
     }
     .letter{
       display: inline-block;
-      opacity: 0.5;
+      opacity: 0.6;
       height: 1em;
       width: 1em;
       margin: 0em;
@@ -110,15 +110,14 @@
       box-shadow: 0em 0em 0.05em 0.05em rgba(0,0,0, 0.7) inset;
     }
     .highlight{
-/*      opacity: 1.0 !important;*/
-      animation: blinker 2s linear infinite;
+      opacity: 1.0 !important;
+    }
+    .blink{
+      animation: blinker 1s linear infinite;
     }
     @keyframes blinker {
-      5%  {opacity: 1.0;}
-      70% {opacity: 1.0;}
-      80% {opacity: 0.5;}
-      95% {opacity: 0.5;}
-      }
+      40% {opacity: 1.0;}
+      60% {opacity: 1.0;}
     }
   </style>
 </head>
@@ -207,7 +206,7 @@
     let ltr = ltrElm.getAttribute('letter');
     if (correction){
       if (ltr == testLetter){
-        ltrElm.classList.remove('highlight');
+        ltrElm.classList.remove('blink');
         correction = false;
       } else {
         return;
@@ -278,7 +277,7 @@
     audElm.removeEventListener('ended', endSound2);
     audElm.addEventListener('ended', endSound);
     playing = null;
-    ltrElm.classList.add('highlight');
+    ltrElm.classList.add('blink');
     correction = true;
     //ltrElm.click();
   }
