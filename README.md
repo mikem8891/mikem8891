@@ -1,6 +1,6 @@
 - 👋 Hi, I’m @mikem8891
 - 👀 I’m interested in engineering, coding, and outer space.
-- 🌱 I’m currently learning HTML, CSS, Javascript, Office XML, WebGL, Rust
+- 🌱 I’m currently learning HTML, CSS, Javascript, WebGL, Rust
 <!--- 
 - 💞️ I’m looking to collaborate on ... 
 --->
